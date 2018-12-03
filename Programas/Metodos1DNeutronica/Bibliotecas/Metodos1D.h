@@ -127,7 +127,7 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,int myno
             for (i = 0;i < NA;i++) {
                  for (int m = EntradaCaio.ordemQuad / 2; m < EntradaCaio.ordemQuad; m++){
                      DMI = -EntradaCaio.MI[m] / H;
-                     NUM = (DMI - XT) * FLUX[jfront][m] + Sj[jback][m] + Q;
+                     NUM = (DMI - XT) * FLUX[jfront][m] + Sj[jback] + Q;
                      DEN = DMI + XT;
                      FLUX[jback][m] = NUM / DEN;
                  }
@@ -143,13 +143,12 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,int myno
              for (i = 0;i < NA;i++) {
                 jback = jback + 1;
                 jfront = jback + 1;
-                for (int m = 0;m < EntradaCaio.ordemQuad;m++){
-                    double soma = 0;
-                    for (int n = 0;n < EntradaCaio.ordemQuad;n++){
-                        soma = soma + EntradaCaio.wn[n] * (FLUX[jfront][n] + FLUX[jback][n]) * 0.5;
-                    }
-                    Smj[jback][m]=soma;
+                double soma = 0;
+                for (int n = 0;n < EntradaCaio.ordemQuad;n++){
+                    soma = soma + EntradaCaio.wn[n] * (FLUX[jfront][n] + FLUX[jback][n]) * 0.5;
                 }
+                soma = soma * 0.5 * EntradaCaio.sigmaEspZona[IZ - 1];
+                Sj[jback] = soma;
             }
          }
          ///FLUXo escalar
@@ -165,15 +164,28 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,int myno
             num = fabs(FESC[i] - FESCold[i]);
             den = FESC[i];
             val = num / den;           //
-            if (maxval < val)
+            if (maxval < val){
                 maxval = val;
+            }
 		}
 
-		for (i = 0;i < EntradaCaio.numNodos + 1;i++)
+		for (int i = 0;i < EntradaCaio.numNodos + 1;i++){
 			FESCold[i] = FESC[i];
-
+		}
 		iter++;
+		cout << iter << endl;
 		///**********************************************
     } ///fecha o while (maxval>erro)
+    time = clock() - time;
+    arq << "Numero de iteracoes: " << iter << endl;
+    arq << "Erro: " << maxval << endl;
+    arq << "Tempo de Resolucao do Problema: " << ((double)time) / CLOCKS_PER_SEC << " segundos" << endl;
+    arq << "/////////////////////////////////////////////" << endl;
+    arq << "Posicao Fluxo Escalar" << endl;
+    for(int i = 0;i < EntradaCaio.numNodos + 1;i++){
+        arq << i << "\t" << FESC[i] << endl;
+    }
+    arq.close();
     ///**********************************************
    }
+#endif
