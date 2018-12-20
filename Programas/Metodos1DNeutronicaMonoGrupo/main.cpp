@@ -63,14 +63,15 @@ int main(int argc,char *argv[])
 {
     int mynode,totalnodes;
     MPI_Init(&argc,&argv);
+    MPI_Comm_rank(MPI_COMM_WORLD,&mynode);
     MPI_Comm_size(MPI_COMM_WORLD,&totalnodes);
-    MPI_Comm_rank(MPI_COMM_WORLD, &mynode);
     string programPath = find_executable();
     programPath = programPath.substr(0,programPath.find("./main",0));
     Dados_Entrada EntradaCaio;
     Metodos1D metodos;
-    lerDadosEntrada(programPath + "dadosEntrada.txt",EntradaCaio);
-    //exibeDadosEntrada(EntradaCaio);
-    metodos.MetodoDD(EntradaCaio,programPath + "dadosSaida.txt",mynode,totalnodes);
+    lerDadosEntrada(programPath + "/dadosEntrada.txt",EntradaCaio);
+    exibeDadosEntrada(EntradaCaio);
+    /*metodos.MetodoDD(EntradaCaio,"dadosSaida.txt","dadosSaida2.txt",mynode,totalnodes);
+    MPI_Finalize();*/
     return 0;
 }
