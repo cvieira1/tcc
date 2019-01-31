@@ -17,7 +17,7 @@ using namespace std;
    numZonas = Numero de Zonas(materiais) no Dominio
    periodicidade = Periodicidade com que os resultados serao exibidos
    mapeamento = Mapeamento das Regios com suas Zonas
-   cp = Criterio de Parada(10ö-?)
+   cp = Criterio de Parada(10Ã¶-?)
    grauAnisotropia = Grau da Anisotropia
    tipoCc = Tipo de cada Condicao de Contorno
    tamanhoRegiao = Comprimento de cada Regiao
@@ -33,8 +33,8 @@ using namespace std;
 */
 
 struct Dados_Entrada {
-    int ordemQuad,numRegioes,numZonas,*nodosRegiao,periodicidade,*mapeamento,grauAnisotropia,*tipoCc,numNodos;
-    double *tamanhoRegiao,*sigmaTotZona,*sigmaEspZona,*valorCc,*fonte,*tamanhoNodo,tamanhoDominio,cp;
+    int ordemQuad,numRegioes,numZonas,*nodosRegiao,periodicidade,*mapeamento,grauAnisotropia,**tipoCc,numNodos,numGrupos;
+    double *tamanhoRegiao,**sigmaTot,****sigmaEsp,**valorCc,**fonte,*tamanhoNodo,tamanhoDominio,cp;
     double *MI,*wn;
 };
 
@@ -45,12 +45,12 @@ class Quadratura1D {
 
 };
 
-///Método para atribuir os valores de MI e wn em problemas 1D
+///MÃ©todo para atribuir os valores de MI e wn em problemas 1D
 void Quadratura1D::DadosQuadrat_GL(Dados_Entrada &EntradaCaio) {
     EntradaCaio.MI=new double[EntradaCaio.ordemQuad]; //MIs da Quadratura
     EntradaCaio.wn=new double[EntradaCaio.ordemQuad]; //OMEGAs da Quadratura
     ////////////////////////////////////////////////
-    //// Seleção do ordem da quadratura (mi e wn)
+    //// SeleÃ§Ã£o do ordem da quadratura (mi e wn)
     //////////////////////////////////////////////
     //Calculo de los coeficientes de Gauss
     int n=EntradaCaio.ordemQuad;
