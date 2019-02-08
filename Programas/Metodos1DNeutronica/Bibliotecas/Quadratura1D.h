@@ -21,8 +21,8 @@ using namespace std;
    grauAnisotropia = Grau da Anisotropia
    tipoCc = Tipo de cada Condicao de Contorno
    tamanhoRegiao = Comprimento de cada Regiao
-   sigmaTotZona = Sigma Total de cada Zona
-   sigmaEspZona = Sigma de Espalhamento de cada Zona
+   sigmaTot = Sigma Total para cada Grupo de Energia em cada Zona
+   sigmaEspZona = Sigma de Espalhamento dos Graus de Anisotropia para cada Grupo de Energia em cada Zona
    valorCc = Valor de cada Condicao de Contorno
    fonte = Valor da Fonte em cada Regiao
    MI = Valor dos Mi de acordo com a Ordem da Quadratura
@@ -33,7 +33,7 @@ using namespace std;
 */
 
 struct Dados_Entrada {
-    int ordemQuad,numRegioes,numZonas,*nodosRegiao,periodicidade,*mapeamento,grauAnisotropia,**tipoCc,numNodos,numGrupos;
+    int ordemQuad,numRegioes,numZonas,*nodosRegiao,periodicidade,*mapeamento,grauAnisotropia,*tipoCc,numNodos,numGrupos;
     double *tamanhoRegiao,**sigmaTot,****sigmaEsp,**valorCc,**fonte,*tamanhoNodo,tamanhoDominio,cp;
     double *MI,*wn;
 };
