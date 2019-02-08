@@ -42,9 +42,9 @@ void exibeDadosEntrada(Dados_Entrada EntradaCaio){
         cout << endl;
       }
     }
+    cout << "Tipo das Condicao de Contorno: " << EntradaCaio.tipoCc[0] << " " << EntradaCaio.tipoCc[1] << endl;
     for(int i = 0;i < EntradaCaio.numGrupos;i++){
       cout << "Grupo de Energia " << i+1 << endl;
-      cout << "Tipo das Condicao de Contorno: " << EntradaCaio.tipoCc[i][0] << " " << EntradaCaio.tipoCc[i][1] << endl;
       cout << "Valor das Condicao de Contorno: " << EntradaCaio.valorCc[i][0] << " " << EntradaCaio.valorCc[i][1] << endl;
     }
     for(int i = 0;i < EntradaCaio.numGrupos;i++){
@@ -74,6 +74,7 @@ void lerDadosEntrada(string caminho,Dados_Entrada &EntradaCaio){
     string linha;
     ifstream arq;
     bool primeiro = true;
+    EntradaCaio.tipoCc = new int[2];
     arq.open(caminho);
     ldado = 0;
     if(arq.is_open()){
@@ -126,11 +127,9 @@ void lerDadosEntrada(string caminho,Dados_Entrada &EntradaCaio){
             case 9:
               EntradaCaio.numGrupos = stoi(linha);
               EntradaCaio.fonte = new double *[EntradaCaio.numGrupos];
-              EntradaCaio.tipoCc = new int *[EntradaCaio.numGrupos];
               EntradaCaio.valorCc = new double *[EntradaCaio.numGrupos];
               for(int i = 0;i < EntradaCaio.numGrupos;i++){
                 EntradaCaio.fonte[i] = new double[EntradaCaio.numRegioes];
-                EntradaCaio.tipoCc[i] = new int[2];
                 EntradaCaio.valorCc[i] = new double[2];
               }
               EntradaCaio.sigmaTot = new double *[EntradaCaio.numZonas];
@@ -195,11 +194,8 @@ void lerDadosEntrada(string caminho,Dados_Entrada &EntradaCaio){
               }
               break;
             case 12:
-              for(int i = 0;i < EntradaCaio.numGrupos;i++){
-                EntradaCaio.tipoCc[i][0] = stoi(linha.substr(0,linha.find(" ")));
-                EntradaCaio.tipoCc[i][1] = stoi(linha.substr((linha.find(" ")+1)));
-                getline(arq,linha);
-              }
+              EntradaCaio.tipoCc[0] = stoi(linha.substr(0,linha.find(" ")));
+              EntradaCaio.tipoCc[1] = stoi(linha.substr((linha.find(" ")+1)));
               break;
             case 13:
               for(int i = 0;i < EntradaCaio.numGrupos;i++){
