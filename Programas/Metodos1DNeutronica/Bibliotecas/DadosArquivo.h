@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include "Quadratura1D.h"
+#include "gnuplot.h"
 
 using namespace std;
 
@@ -213,6 +214,9 @@ void lerDadosEntrada(string caminho,Dados_Entrada &EntradaCaio){
                 getline(arq,linha);
               }
               break;
+            case 15:
+               EntradaCaio.geraGrafico = stoi(linha);
+               break;
             default:
               break;
           }
@@ -224,4 +228,20 @@ void lerDadosEntrada(string caminho,Dados_Entrada &EntradaCaio){
     arq.close();
 }
 
+void gerarGraficosSaida(string caminho,Dados_Entrada EntradaCaio){
+    ifstream arq;
+    arq.open(caminho);
+    gnuplot gp;
+    int linhaCount = 7;
+    int numLinhas = (EntradaCaio.numNodos / EntradaCaio.periodicidade) + 1;
+    for(int i = 0;i < EntradaCaio.numGrupos;i++){
+      gp("set terminal png");
+      gp("set output 'saidaGrupo" + to_string(i+1) + ".png'");
+      gp("set xlabel \"Posicao\"");
+      gp("set ylabel \"Fluxo Escalar\"");
+      gp("plot \"<(sed -n '" + to_string(linhaCount) + "," + to_string(linhaCount + numLinhas) + "p' dadosSaida.txt)\" notitle with lines linestyle 1," +
+         "\"<(sed -n '" + to_string(linhaCount) + "," + to_string(linhaCount + numLinhas) + "p' dadosSaida.txt)\" title 'Solucao de Referencia'");
+      linhaCount += (numLinhas + 1);
+    }
+}
 #endif // DADOSARQUIVO_H_INCLUDED
