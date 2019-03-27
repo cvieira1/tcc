@@ -181,6 +181,7 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
                   double soma = 0;
                   double somaFinal = 0;
                   for(int g2 = 0;g2 < EntradaCaio.numGrupos;g2++){
+	            soma = 0;
                     for (int n = 0;n < EntradaCaio.ordemQuad;n++){
                       double somaIntLocal = 0;
                       double somaIntGlobal = 0;
