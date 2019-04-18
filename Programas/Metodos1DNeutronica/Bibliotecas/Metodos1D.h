@@ -31,7 +31,7 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
        tAbs = taxa de absorcao
     */
     int iter,startVal, endVal, accum,jfrontOriginal,jbackOriginal;
-    double ***Sgmi,  **FESCold, maxval,  val, ***FLUX, **FESC, ***FESCmed, **fuga, **tAbs,***Sgim, startTime, endTime;
+    double ***Sgmi,  **FESCold, maxval,  val, ***FLUX, **FESC, **FESCmed, **fuga, **tAbs,***Sgim, startTime, endTime;
     FILE* arq = fopen("dadosSaida.txt","wb+");
     FILE* arq2 = fopen("dadosSaida2.txt","wb+");
     startTime = MPI_Wtime();
@@ -39,7 +39,7 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
     FESCold = new double *[EntradaCaio.numGrupos];
     FLUX = new double **[EntradaCaio.numGrupos];
     Sgim = new double **[EntradaCaio.numGrupos];
-    FESCmed = new double **[EntradaCaio.numGrupos];
+    FESCmed = new double *[EntradaCaio.numGrupos];
     fuga = new double *[EntradaCaio.numGrupos];
     tAbs = new double *[EntradaCaio.numGrupos];
     for(int g = 0;g < EntradaCaio.numGrupos;g++){
@@ -47,15 +47,12 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
       FESCold[g] = new double [EntradaCaio.numNodos + 1];
       FLUX[g] = new double *[EntradaCaio.numNodos + 1];
       Sgim[g] = new double *[EntradaCaio.numNodos + 1];
-      FESCmed[g] = new double *[EntradaCaio.numNodos];
+      FESCmed[g] = new double [EntradaCaio.numNodos];
       fuga[g] = new double[2];
       tAbs[g] = new double [EntradaCaio.numRegioes];
       for (int i = 0;i < EntradaCaio.numNodos + 1;i++){
         FLUX[g][i] = new double [EntradaCaio.ordemQuad];
         Sgim[g][i] = new double [EntradaCaio.ordemQuad];
-        if(i < EntradaCaio.numNodos){
-          FESCmed[g][i] = new double [EntradaCaio.ordemQuad];
-        }
       }
     }
     maxval = 100;
@@ -66,12 +63,12 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
       for (int i = 0;i < EntradaCaio.numNodos + 1;i++){
         FESC[g][i] = 0;
         FESCold[g][i] = 0;
+        if(i < EntradaCaio.numNodos){
+          FESCmed[g][i] = 0;
+        }
         for (int m = 0;m < EntradaCaio.ordemQuad;m++){
             FLUX[g][i][m] = 0;
             Sgim[g][i][m] = 0;
-            if(i < EntradaCaio.numNodos){
-              FESCmed[g][i][m] = 0;
-            }
         }
       }
     }
@@ -102,8 +99,8 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
  		///////////////////////////
     	///Varredura direita
         ///cout<<"Aquiiiiii Varredura direita"<<endl;
-        for(int g = 0;g < EntradaCaio.numGrupos;g++){
-          if (EntradaCaio.tipoCc[g][0] == 2){
+        if (EntradaCaio.tipoCc[0] == 2){
+          for(int g = 0;g < EntradaCaio.numGrupos;g++){
             for (int m = 0;m < EntradaCaio.ordemQuad / 2;m++){
                 FLUX[g][0][m] = FLUX[g][0][m + EntradaCaio.ordemQuad / 2];
             }
@@ -135,13 +132,13 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
  		///////////////////////////
         ///Varredura esquerda
 
-        for(int g = 0;g < EntradaCaio.numGrupos;g++){
-          if (EntradaCaio.tipoCc[g][1] == 2){
-            for (int m = EntradaCaio.ordemQuad / 2;m < EntradaCaio.ordemQuad;m++){
+          if (EntradaCaio.tipoCc[1] == 2){
+            for(int g = 0;g < EntradaCaio.numGrupos;g++){
+              for (int m = EntradaCaio.ordemQuad / 2;m < EntradaCaio.ordemQuad;m++){
                 FLUX[g][EntradaCaio.numNodos][m] = FLUX[g][EntradaCaio.numNodos][m - EntradaCaio.ordemQuad / 2];
+              }
             }
           }
-        }
 
         jfrontOriginal = jfront;
         jbackOriginal = jback;
@@ -179,9 +176,12 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
                 jfront = jback + 1;
                 for(int m = 0;m < EntradaCaio.ordemQuad;m++){
                   double soma = 0;
+                  double soma2 = 0; //Varaiavel necessaria para calculo do FESCmed
+                  double termoSoma2 = 0;
                   double somaFinal = 0;
                   for(int g2 = 0;g2 < EntradaCaio.numGrupos;g2++){
-	            soma = 0;
+                    soma = 0;
+                    soma2 = 0;
                     for (int n = 0;n < EntradaCaio.ordemQuad;n++){
                       double somaIntLocal = 0;
                       double somaIntGlobal = 0;
@@ -191,10 +191,12 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
                         somaIntLocal += (2*l + 1) * 0.5 * EntradaCaio.sigmaEsp[IZ - 1][l][g1][g2] * Pn(l,EntradaCaio.MI[m]) * Pn(l,EntradaCaio.MI[n]);
                       }
                       MPI_Allreduce(&somaIntLocal,&somaIntGlobal,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
-                      soma += somaIntGlobal * EntradaCaio.wn[n] * (FLUX[g2][jfront][n] + FLUX[g2][jback][n]) * 0.5;
-                      FESCmed[g2][jback][n] = soma;
+                      termoSoma2 = EntradaCaio.wn[n] * (FLUX[g2][jfront][n] + FLUX[g2][jback][n]) * 0.5;
+                      soma += somaIntGlobal * termoSoma2;
+                      soma2 += termoSoma2;
                     }
                     somaFinal += soma;
+                    FESCmed[g2][jback] = soma2;
                   }
                   Sgim[g1][jback][m] = somaFinal;
                 }
@@ -230,9 +232,9 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
 		  }
 		}
 		iter++;
+		cout << iter << endl;
 		/////**********************************************
     } ///fecha o while (maxval>erro)
-
 
 /// Calculo de fuga
     for(int g = 0;g < EntradaCaio.numGrupos;g++){
@@ -240,7 +242,7 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
       for(int m = EntradaCaio.ordemQuad / 2;m < EntradaCaio.ordemQuad;m++){
         soma += -EntradaCaio.MI[m] * FLUX[g][0][m] * EntradaCaio.wn[m];
       }
-      fuga[g][0] = soma;
+      fuga[g][0] = soma * 0.5;
     }
 
     for(int g = 0;g < EntradaCaio.numGrupos;g++){
@@ -248,58 +250,76 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
       for(int m = 0;m < EntradaCaio.ordemQuad / 2;m++){
         soma += EntradaCaio.MI[m] * FLUX[g][EntradaCaio.numNodos][m] * EntradaCaio.wn[m];
       }
-      fuga[g][1] = soma;
+      fuga[g][1] = soma * 0.5;
     }
 
 /// Calculo taxa de absorcao
+
     for(int g = 0;g < EntradaCaio.numGrupos;g++){
-      int iter2 = 0;
-      int iter3 = 0;
+      int realCount = 0;
       for(int i = 0;i < EntradaCaio.numRegioes;i++){
         double soma = 0;
         double soma_global = 0;
+        double sigmaEspTot = 0;
         IZ = EntradaCaio.mapeamento[i];
-        startVal = EntradaCaio.nodosRegiao[i] * mynode / totalnodes;
-        endVal = EntradaCaio.nodosRegiao[i] * (mynode + 1) / totalnodes;
-        iter2 = iter3 + startVal;
-        for(int j = startVal;j < endVal;j++){
-          soma += EntradaCaio.tamanhoNodo[i] * FESCmed[g][iter2][j];
-          iter2++;
+        for(int j = 0;j < EntradaCaio.nodosRegiao[i];j++){
+          soma += EntradaCaio.tamanhoNodo[i] * FESCmed[g][j + realCount];
         }
-        iter3 += EntradaCaio.nodosRegiao[i];
-        MPI_Reduce(&soma,&soma_global,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-//       soma_global *= (EntradaCaio.sigmaTot[IZ - 1] - EntradaCaio.sigmaEsp[IZ - 1]);
+        realCount += EntradaCaio.nodosRegiao[i];
+        for(int j = 0;j < EntradaCaio.numGrupos;j++){
+            sigmaEspTot += EntradaCaio.sigmaEsp[IZ - 1][0][j][g];
+        }
+        soma_global = soma;
+        soma_global *= (EntradaCaio.sigmaTot[IZ - 1][g] - sigmaEspTot);
         tAbs[g][i] = soma_global;
       }
     }
     endTime = MPI_Wtime();
+    double taxa = (EntradaCaio.periodicidade * EntradaCaio.tamanhoDominio / EntradaCaio.numNodos);
     if(mynode == 0){
-      fprintf(arq,"Numero de iteracoes: %d\n",iter);
-      fprintf(arq,"Erro: %.6g\n",maxval);
-      fprintf(arq,"Tempo de Resolucao do Problema: %.6g segundos\n",endTime - startTime);
-      fprintf(arq,"/////////////////////////////////////////////\n");
-      fprintf(arq,"Posicao Fluxo Escalar\n");
-      for(int g = 0;g < EntradaCaio.numGrupos;g++){
-        fprintf(arq,"Grupo de Energia %d\n",g + 1);
+        fprintf(arq,"Numero de iteracoes: %d\n",iter);
+        fprintf(arq,"Erro: %.6g\n",maxval);
+        fprintf(arq,"Tempo de Resolucao do Problema: %.6g segundos\n",endTime - startTime);
+        fprintf(arq,"/////////////////////////////////////////////\n");
+        fprintf(arq,"Posicao\tFluxo Escalar\n");
+        for(int g = 0;g < EntradaCaio.numGrupos;g++){
+            fprintf(arq,"\tGrupo de Energia %d",g + 1);
+        }
+        fprintf(arq,"\n");
+        double realI = 0.0;
         for(int i = 0;i < EntradaCaio.numNodos + 1;i += EntradaCaio.periodicidade){
-          fprintf(arq,"%d\t%.6g\n",i,FESC[g][i]);
+            fprintf(arq,"%.6g\t",realI);
+            for(int g = 0;g < EntradaCaio.numGrupos;g++){
+                fprintf(arq,"%.6g\t",FESC[g][i]);
+            }
+            fprintf(arq,"\n");
+            realI += taxa;
         }
-      }
-      fclose(arq);
-      fprintf(arq2,"Fuga\n");
-      fprintf(arq2,"Esquerda  Direita\n");
-      for(int g = 0;g < EntradaCaio.numGrupos;g++){
-        fprintf(arq2,"Grupo de energia %d\n",g + 1);
-        fprintf(arq2,"%.6g  %.6g\n",fuga[g][0],fuga[g][1]);
-      }
-      fprintf(arq2,"Taxa de Absorcao\n");
-      for(int g = 0;g < EntradaCaio.numGrupos;g++){
-        fprintf(arq2,"Grupo de Energia %d\n",g + 1);
+        fclose(arq);
+        fprintf(arq2,"Fuga Esq: ");
+        for(int g = 0;g < EntradaCaio.numGrupos;g++){
+          fprintf(arq2,"%.6g  ",fuga[g][0]);
+        }
+        fprintf(arq2,"\n");
+        fprintf(arq2,"Fuga Dir: ");
+        for(int g = 0;g < EntradaCaio.numGrupos;g++){
+          fprintf(arq2,"%.6g  ",fuga[g][1]);
+        }
+        fprintf(arq2,"\n");
+        fprintf(arq2,"Taxa de Absorcao\n");
+        fprintf(arq2,"\t\t");
         for(int i = 0;i < EntradaCaio.numRegioes;i++){
-          fprintf(arq2,"Regiao %d: %.6g\n",i,tAbs[g][i]);
+            fprintf(arq2,"\tRegiao %d",i+1);
         }
-      }
-      fclose(arq2);
+        fprintf(arq2,"\n");
+        for(int g = 0;g < EntradaCaio.numGrupos;g++){
+          fprintf(arq2,"Grupo de Energia %d",g + 1);
+          for(int i = 0;i < EntradaCaio.numRegioes;i++){
+            fprintf(arq2,"\t%.6g",tAbs[g][i]);
+          }
+          fprintf(arq2,"\n");
+        }
+        fclose(arq2);
     }else{
     }
     ///**********************************************
