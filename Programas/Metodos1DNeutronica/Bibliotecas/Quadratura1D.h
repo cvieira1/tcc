@@ -33,7 +33,7 @@ using namespace std;
 */
 
 struct Dados_Entrada {
-    int ordemQuad,numRegioes,numZonas,*nodosRegiao,periodicidade,*mapeamento,grauAnisotropia,*tipoCc,numNodos,numGrupos;
+    int ordemQuad,numRegioes,numZonas,*nodosRegiao,periodicidade,*mapeamento,grauAnisotropia,*tipoCc,numNodos,numGrupos,geraGrafico,*somaNodosRegiao;
     double *tamanhoRegiao,**sigmaTot,****sigmaEsp,**valorCc,**fonte,*tamanhoNodo,tamanhoDominio,cp;
     double *MI,*wn;
 };
