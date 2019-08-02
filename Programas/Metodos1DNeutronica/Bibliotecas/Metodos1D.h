@@ -11,14 +11,19 @@
 #include <thread>
 #include "Quadratura1D.h"
 #include "legendre.h"
+#include "Eigen/Dense"
+#include "Eigen/Eigenvalues"
 
 using namespace std;
 using namespace Legendre;
+using Eigen::MatrixXd;
+using Eigen::EigenSolver;
 
 class Metodos1D{
    public:
       void MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string caminhoSaida2);
-      void gerarMatrizResposta(Dados_Entrada &EntradaCaio,int piv);
+      void metodoMatrizResposta(Dados_Entrada &EntradaCaio);
+      MatrixXd gerarMatrizResposta(Dados_Entrada &EntradaCaio,int piv);
 };
 
 void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string caminhoSaida2){
@@ -39,11 +44,11 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
     clock_t startTime2, endTime2;
     FILE* arq = fopen("dadosSaida.txt","wb+");
     FILE* arq2 = fopen("dadosSaida2.txt","wb+");
-//    #ifdef _OPENMP
-//        startTime = omp_get_wtime();
-//    #else
+    #ifdef _OPENMP
+        startTime = omp_get_wtime();
+    #else
         startTime2 = clock();
-//    #endif
+    #endif
     FESC = new double *[EntradaCaio.numGrupos];
     FESCold = new double *[EntradaCaio.numGrupos];
     FLUX = new double *[EntradaCaio.numNodos +1];
@@ -194,10 +199,11 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
         double soma1,somaFinal,somaIntGlobal;
         int i,g1,igm1,g2,l,n,ig1n,m;
         jback = -1;
-//        #pragma omp parallel for firstprivate(IZ,NA,i,jback,jfront,g1,igm1,m,soma1,somaFinal,g2,ig1n,n,somaIntGlobal,l) num_threads(2)
+        #pragma omp parallel for firstprivate(IZ,NA,i,g1,igm1,g2,l,n,ig1n,m,jfront,jback,soma1,somaFinal,somaIntGlobal) num_threads(2)
         for(int piv = 0;piv < EntradaCaio.numRegioes;piv++){
             IZ = EntradaCaio.mapeamento[piv];
             NA = EntradaCaio.nodosRegiao[piv];
+            jback = EntradaCaio.somaNodosRegiao[piv];
             for(i = 0;i < NA;i++) {
                 jback = jback + 1;
                 jfront = jback + 1;
@@ -246,18 +252,20 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
 
         int g3,igm,m1;
         double soma;
-        #pragma omp parallel for firstprivate(g3,igm,soma,m1) num_threads(2)
+        #pragma omp parallel for firstprivate(g3,igm,m1,soma) num_threads(2)
         for(int i = 0;i < EntradaCaio.numNodos + 1;i++) {
             for(g3 = 0;g3 < EntradaCaio.numGrupos;g3++){
                 igm = g3 * EntradaCaio.ordemQuad - 1;
                 soma = 0;
                 for (m1 = 0;m1 < EntradaCaio.ordemQuad;m1++){
                     igm++;
-                    soma = soma + FLUX[i][igm] * EntradaCaio.wn[m1];
+                    soma += FLUX[i][igm] * EntradaCaio.wn[m1];
                 }
                 FESC[g3][i] = 0.5 * soma;
             }
         }
+
+
 
 		///Calculo da norma para o criterio de parada (convergencia do NBI) e
 		for(int g = 0;g < EntradaCaio.numGrupos;g++){
@@ -316,12 +324,12 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
             tAbs[g][i] = soma_global;
         }
     }
-//    #ifdef _OPENMP
-//        endTime = omp_get_wtime() - startTime;
-//    #else
+    #ifdef _OPENMP
+        endTime = omp_get_wtime() - startTime;
+    #else
         endTime2 = clock();
         endTime = (endTime2 - startTime2) / (double) CLOCKS_PER_SEC;
-//    #endif
+    #endif
     cout << "Tempo: " << endTime << endl;
     double taxa = (EntradaCaio.periodicidade * EntradaCaio.tamanhoDominio / EntradaCaio.numNodos);
     fprintf(arq,"Numero de iteracoes: %d\n",iter);
@@ -370,15 +378,24 @@ void Metodos1D::MetodoDD(Dados_Entrada &EntradaCaio,string caminhoSaida,string c
     ///**********************************************
    }
 
-void Metodos1D::gerarMatrizResposta(Dados_Entrada &EntradaCaio,int piv){
+void Metodos1D::metodoMatrizResposta(Dados_Entrada &EntradaCaio){
+    double ordemMatriz = EntradaCaio.numGrupos * EntradaCaio.ordemQuad;
+    MatrixXd AA((int)ordemMatriz, (int)ordemMatriz);
+    for(int piv = 0;piv < EntradaCaio.numZonas;piv++){
+        AA = gerarMatrizResposta(EntradaCaio, piv);
+        EigenSolver<MatrixXd> eS(AA);
+        cout << "Autovalores de AA:" << endl << eS.eigenvalues() << endl;
+        cout << "Matriz de AutoVetores de AA: " << endl << eS.eigenvectors() << endl;
+    }
+}
+
+MatrixXd Metodos1D::gerarMatrizResposta(Dados_Entrada &EntradaCaio,int piv){
     int aux;
     int IZ = EntradaCaio.mapeamento[piv];
     int igm = -1;
-    double **AA;
-    AA = new double *[EntradaCaio.numGrupos * EntradaCaio.ordemQuad];
-    for(int i = 0;i < (EntradaCaio.numGrupos * EntradaCaio.ordemQuad);i++){
-        AA[i] = new double [EntradaCaio.numGrupos * EntradaCaio.ordemQuad];
-    }
+    double ordemMatriz = EntradaCaio.numGrupos * EntradaCaio.ordemQuad;
+    MatrixXd AA((int)ordemMatriz, (int)ordemMatriz);
+    cout << "piv:" << piv << endl;
     for(int g = 0;g < EntradaCaio.numGrupos;g++){
         for(int m = 0;m < EntradaCaio.ordemQuad;m++){
             igm++;
@@ -394,13 +411,16 @@ void Metodos1D::gerarMatrizResposta(Dados_Entrada &EntradaCaio,int piv){
                     double soma = 0;
                     for(int l = 0;l <= EntradaCaio.grauAnisotropia;l++){
                         soma += (2 * l + 1) * 0.5 * EntradaCaio.sigmaEsp[IZ - 1][l][g][g1] / EntradaCaio.sigmaTot[IZ - 1][g] *
-                        Pn(l,EntradaCaio.MI[m]) * Pn(l,EntradaCaio.MI[n]) * EntradaCaio.wn[n];
+                        Pn(l, EntradaCaio.MI[m]) * Pn(l, EntradaCaio.MI[n]) * EntradaCaio.wn[n];
                     }
-                    AA[igm][jg1n] = EntradaCaio.sigmaTot[IZ - 1][g] / EntradaCaio.MI[m] * (aux - soma);
+                    AA(igm, jg1n) = EntradaCaio.sigmaTot[IZ - 1][g] / EntradaCaio.MI[m] * (aux - soma);
+                    cout << AA(igm, jg1n) << " ";
                 }
             }
+            cout << endl;
         }
     }
+    return AA;
 }
 #endif
 
