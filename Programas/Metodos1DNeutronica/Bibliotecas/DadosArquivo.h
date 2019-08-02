@@ -94,7 +94,9 @@ void lerDadosEntrada(string caminho,Dados_Entrada &EntradaCaio){
               EntradaCaio.nodosRegiao = new int[EntradaCaio.numRegioes];
               EntradaCaio.mapeamento = new int[EntradaCaio.numRegioes];
               EntradaCaio.tamanhoNodo = new double[EntradaCaio.numRegioes];
+              EntradaCaio.somaNodosRegiao = new int[EntradaCaio.numRegioes];
               EntradaCaio.numNodos = 0;
+              EntradaCaio.somaNodosRegiao[0] = -1;
               EntradaCaio.tamanhoDominio = 0;
               break;
             case 4:
@@ -108,6 +110,9 @@ void lerDadosEntrada(string caminho,Dados_Entrada &EntradaCaio){
               for(int i = 0; i < EntradaCaio.numRegioes;i++){
                 EntradaCaio.nodosRegiao[i] = stoi(linha.substr(0,linha.find(" ")));
                 EntradaCaio.numNodos += EntradaCaio.nodosRegiao[i];
+                if(i < (EntradaCaio.numRegioes - 1)){
+                    EntradaCaio.somaNodosRegiao[i + 1] = EntradaCaio.numNodos - 1;
+                }
                 EntradaCaio.tamanhoNodo[i] = EntradaCaio.tamanhoRegiao[i] / EntradaCaio.nodosRegiao[i];
                 linha = linha.substr((linha.find(" ")+1));
               }
@@ -234,14 +239,30 @@ void gerarGraficosSaida(string caminho,Dados_Entrada EntradaCaio){
     gnuplot gp;
     int linhaCount = 7;
     int numLinhas = (EntradaCaio.numNodos / EntradaCaio.periodicidade) + 1;
-    for(int i = 0;i < EntradaCaio.numGrupos;i++){
+    for(int i = 1;i <= EntradaCaio.numGrupos;i++){
+      gp("set encoding iso_8859_1");
       gp("set terminal png");
-      gp("set output 'saidaGrupo" + to_string(i+1) + ".png'");
-      gp("set xlabel \"Posicao\"");
+      gp("set output 'saidaGrupo" + to_string(i) + ".png'");
+      gp("set xlabel \"Posi\347\343o\"");
       gp("set ylabel \"Fluxo Escalar\"");
-      gp("plot \"<(sed -n '" + to_string(linhaCount) + "," + to_string(linhaCount + numLinhas) + "p' dadosSaida.txt)\" notitle with lines linestyle 1," +
-         "\"<(sed -n '" + to_string(linhaCount) + "," + to_string(linhaCount + numLinhas) + "p' dadosSaida.txt)\" title 'Solucao de Referencia'");
-      linhaCount += (numLinhas + 1);
+      gp("plot \"<(sed -n '" + to_string(7) + "," + to_string(linhaCount + numLinhas) + "p' dadosSaida.txt)\" using 1:"
+          + to_string(i + 1) + " notitle with lines linestyle 1," + "\"<(sed -n '" + to_string(7) + "," + to_string(linhaCount + numLinhas) +
+          "p' dadosSaida.txt)\" using 1:" + to_string(i + 1) +"title 'Solu\347\343o de Refer\352ncia'");
     }
 }
+
+void gerarGraficosSaida2(string caminho){
+    ifstream arq;
+    arq.open(caminho);
+    gnuplot gp;
+    gp("set encoding iso_8859_1");
+    gp("set terminal png");
+    gp("set output 'graficoTempoNCD.png'");
+    gp("set xlabel \"N\372mero de Nodos\"");
+//    gp("set xlabel \"Ordem da Quadratura\"");
+    gp("set ylabel \"Tempo\"");
+    gp("set style data linespoints");
+    gp("plot \"Arquivos/dadosTempoNCD.txt\" title 'Serial',\"Arquivos/dadosTempoNCD2.txt\" title 'Paralelo com 2 threads',\"Arquivos/dadosTempoNCD3.txt\" title 'Paralelo com 4 threads'");
+}
+
 #endif // DADOSARQUIVO_H_INCLUDED
