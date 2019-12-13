@@ -1,0 +1,6 @@
+//Dimensoes (1-1D e 2-2D)
+1
+//Número de Grupos de Energia
+5
+//Grau da Anisotropia do Espalhamento (L)
+5

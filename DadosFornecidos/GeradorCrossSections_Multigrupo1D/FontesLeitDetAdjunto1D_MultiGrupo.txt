@@ -1,0 +1,11 @@
+////Fontes Fisicas para a Leitura do Detector Problema Adjunto SGF
+//g= 1
+0 0 0 0 0 
+//g= 2
+0 0 0 0 0 
+//g= 3
+0 0 0 0 0 
+//g= 4
+0 0 0 0 0 
+//g= 5
+0 0 0 0 0 

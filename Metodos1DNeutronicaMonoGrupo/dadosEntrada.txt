@@ -1,0 +1,30 @@
+//Ordem da Quadratura GL
+2
+//NR e NZ
+1 1
+//Dados por Regiao
+//Comprimento
+100
+//Nodos por Regiao
+2
+//Periodicidade
+1
+//Mapeamento
+1
+//CP e-?
+6
+//Grupos de Energia
+1
+//Grau da Anisotropia do Espalhamento (L)
+0
+//Dados por Zona
+//Sigma Total
+1.0
+//Sigma Espalhamento
+0.6
+//Tipo de Condicoes de Contorno (Esq. Dir) (1-Prescrita. 2-Reflexiva)
+1 1
+//Valor da condicao de contorno prescrita (Esq. Dir)
+1 0
+//Fonte Fisica
+0

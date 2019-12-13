@@ -1,0 +1,5 @@
+////Numero de Detectores
+2
+////Seção de choque de absorção do detector (Por Grupo de Energia, g=1..G) - Posição Inicial - Posição Final
+0.0816667 0.17 0.27 0 2
+0.106981 0.220947 0.347134 2 5

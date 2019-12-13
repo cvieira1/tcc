@@ -1,0 +1,43 @@
+# depslib dependency file v1.0
+1470062856 source:d:\documents\documentos gsus\doctorado\iprj\pesquisa\problema adjunto xy\programas_transp\geradorcrosssections_multigrupo1d\main.cpp
+	<iostream>
+	<iomanip>
+	<fstream>
+	<sstream>
+	<stdio.h>
+	<stdlib.h>
+	<string>
+	<cstdlib>
+	<math.h>
+	"legendre.h"
+
+1478116882 source:c:\users\aluno\desktop\jesús_2\geradorcrosssections_multigrupo1d\main.cpp
+	<iostream>
+	<iomanip>
+	<fstream>
+	<sstream>
+	<stdio.h>
+	<stdlib.h>
+	<string>
+	<cstdlib>
+	<math.h>
+	"legendre.h"
+
+1467312610 d:\documents\documentos gsus\doctorado\iprj\pesquisa\problema adjunto xy\programas_transp\geradorcrosssections_multigrupo1d\legendre.h
+
+1467316210 c:\users\aluno\desktop\jesús_2\geradorcrosssections_multigrupo1d\legendre.h
+
+1470062858 source:e:\geradorcrosssections_multigrupo1d\main.cpp
+	<iostream>
+	<iomanip>
+	<fstream>
+	<sstream>
+	<stdio.h>
+	<stdlib.h>
+	<string>
+	<cstdlib>
+	<math.h>
+	"legendre.h"
+
+1467312610 e:\geradorcrosssections_multigrupo1d\legendre.h
+

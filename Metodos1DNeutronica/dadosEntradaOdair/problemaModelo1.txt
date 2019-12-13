@@ -1,0 +1,51 @@
+//Modo de Compilacao (1-Serial, 2-Paralelo)
+1 
+//Ordem da Quadratura GL
+8
+//NR e NZ
+4 3
+//Dados por Regiao
+//Comprimento
+20 36 24 20
+//Nodos por Regiao
+1 1 1 1
+//Periodicidade
+1
+//Mapeamento
+1 2 3 1
+//CP e-?
+6
+//Grupos de Energia
+2
+//Grau da Anisotropia do Espalhamento (L)
+0
+//Dados por Zona
+///Zona 1
+//Sigma Total
+1.0 1.2
+//Sigma Espalhamento
+0.9 0.2
+0.05 0.8
+///Zona 2
+//Sigma Total
+0.9 1.5
+//Sigma Espalhamento
+0.75 0.3
+0.1 0.99
+///Zona 3
+//Sigma Total
+1.1 0.85
+//Sigma Espalhamento
+0.95 0.6
+0.0 0.2
+//Tipo de Condicoes de Contorno (Esq. Dir) (1-Prescrita. 2-Reflexiva)
+2 1
+//Valor da condicao de contorno prescrita (Esq. Dir)
+1 0
+1 0
+//Fonte Fisica
+1 0 0 0
+1 0 0 0
+//Gera grafico(1 - Sim. 2 - Não)
+2 
+

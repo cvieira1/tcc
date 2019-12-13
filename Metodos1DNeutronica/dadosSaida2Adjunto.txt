@@ -1,0 +1,18 @@
+Grupo de Energia 0
+Leitura Detector Fonte 0(2.0cm - 5.0cm): 1.02048
+Leitura Detector Fonte 1(14.0cm - 20.0cm): 0.388032
+Leitura Detector Contorno: 0.0948707
+Leitura Detector Total: 1.50338
+
+Grupo de Energia 9
+Leitura Detector Fonte 0(2.0cm - 5.0cm): 0.011374
+Leitura Detector Fonte 1(14.0cm - 20.0cm): 0.00422234
+Leitura Detector Contorno: 0.00111726
+Leitura Detector Total: 0.0167135
+
+Grupo de Energia 19
+Leitura Detector Fonte 0(2.0cm - 5.0cm): 0.00753038
+Leitura Detector Fonte 1(14.0cm - 20.0cm): 0.00281752
+Leitura Detector Contorno: 0.000720414
+Leitura Detector Total: 0.0110683
+
