@@ -1,0 +1,59 @@
+# depslib dependency file v1.0
+1540786641 source:/Users/Caio/Documents/ic/Programas/LeituraDados/main.cpp
+	<iostream>
+	<fstream>
+	<sstream>
+	"Bibliotecas/Quadratura1D.h"
+	"mpi.h"
+
+1540783398 /Users/Caio/Documents/ic/Programas/LeituraDados/Bibliotecas/Quadratura1D.h
+	<iostream>
+	<string>
+
+1540782453 source:/Users/Caio/Documents/ic/Programas/LeituraDados/Quadratura1D.cpp
+	<iostream>
+	"Bibliotecas/Quadratura1D.h"
+	<string>
+	<fstream>
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+
+1542063220 source:/Users/Caio/Documents/ic/Programas/Metodos1DNeutronica/Quadratura1D.cpp
+
+1542481654 /Users/Caio/Documents/ic/Programas/Metodos1DNeutronica/Bibliotecas/Quadratura1D.h
+	<fstream>
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<iostream>
+	<string>
+
+1543278329 source:/Users/Caio/Documents/ic/Programas/Metodos1DNeutronica/main.cpp
+	<iostream>
+	<fstream>
+	<sstream>
+	<string.h>
+	"Bibliotecas/Quadratura1D.h"
+	"Bibliotecas/DadosArquivo.h"
+	"Bibliotecas/Metodos1D.h"
+	"mpi.h"
+	<vector>
+	<boost/filesystem.hpp>
+	<windows.h>
+	<sstream>
+	<unistd.h>
+	<mach-o/dyld.h>
+
+1542481884 /Users/Caio/Documents/ic/Programas/Metodos1DNeutronica/Bibliotecas/DadosArquivo.h
+	<cmath>
+	"Quadratura1D.h"
+
+1543689015 /Users/Caio/Documents/ic/Programas/Metodos1DNeutronica/Bibliotecas/Metodos1D.h
+	<cmath>
+	<iostream>
+	<fstream>
+	<ctime>
+	"Quadratura1D.h"
+	"mpi.h"
+

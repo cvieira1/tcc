@@ -1,0 +1,8 @@
+Numero de iteracoes: 21
+Erro: 7.25295e-07
+Tempo de Resolucao do Problema: 0.000524
+ segundos/////////////////////////////////////////////
+Posicao Fluxo Escalar
+0	0.525896
+1	-0.479778
+2	0.436172

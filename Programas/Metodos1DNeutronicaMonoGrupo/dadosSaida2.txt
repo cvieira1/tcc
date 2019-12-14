@@ -1,0 +1,5 @@
+Fuga
+Esquerda  Direita
+0.0255638  0.424219
+Taxa de Absorcao
+Regiao 0: 0.404442

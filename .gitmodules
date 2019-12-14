@@ -1,0 +1,6 @@
+[submodule "Programas/programas/metodos1dneutronicaadjunto"]
+	path = Programas/programas/metodos1dneutronicaadjunto
+	url = https://github.com/cvieira1/tcc.git
+[submodule "repo2/repo2/tcc"]
+	path = repo2/repo2/tcc
+	url = https://github.com/cvieira1/tcc.git
